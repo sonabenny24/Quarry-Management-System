@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Quarry Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Administrator Dashboard</h3>
+        <p class="text-muted small mb-0">System overview, metrics, and business operations</p>
+    </div>
+    <span class="badge bg-danger px-3 py-2 fs-6 rounded-pill"><i class="fa-solid fa-user-shield me-1"></i> Admin Panel</span>
+</div>
+
+<!-- Quick Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon-box bg-primary text-white"><i class="fa-solid fa-building-circle-check"></i></div>
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Approved Dealers</h6>
+            <h2 class="fw-bold mb-0 text-dark">{{ total_dealers }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon-box bg-warning text-dark"><i class="fa-solid fa-clock"></i></div>
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Pending Dealers</h6>
+            <h2 class="fw-bold mb-0 text-dark">{{ pending_dealers }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon-box bg-success text-white"><i class="fa-solid fa-users"></i></div>
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Registered Clients</h6>
+            <h2 class="fw-bold mb-0 text-dark">{{ total_clients }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon-box bg-info text-white"><i class="fa-solid fa-file-invoice"></i></div>
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Total System Orders</h6>
+            <h2 class="fw-bold mb-0 text-dark">{{ total_orders }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-list-check me-2 text-primary"></i> Recent System Orders</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Client</th>
+                            <th>Dealer</th>
+                            <th>Material</th>
+                            <th>Quantity</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td class="fw-bold">#{{ order.order_id }}</td>
+                            <td>{{ order.client.name }}</td>
+                            <td>{{ order.dealer.dealer_profile.company_name if order.dealer.dealer_profile else order.dealer.name }}</td>
+                            <td>{{ order.material.name }}</td>
+                            <td>{{ order.quantity }} {{ order.material.unit }}</td>
+                            <td class="fw-bold">₹{{ "%.2f"|format(order.total_price) }}</td>
+                            <td>
+                                <span class="status-badge status-{{ order.status.lower().replace(' ', '-') }}">{{ order.status }}</span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">No recent orders found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white py-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-bars-progress me-2 text-primary"></i> Admin Shortcuts</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin_dealers') }}" class="btn btn-outline-primary text-start p-3 rounded-3">
+                        <div class="fw-bold"><i class="fa-solid fa-user-check me-2"></i> Review Dealer Applications</div>
+                        <small class="text-muted d-block mt-1">Approve or reject pending quarry dealer registrations</small>
+                    </a>
+                    <a href="{{ url_for('admin_materials') }}" class="btn btn-outline-secondary text-start p-3 rounded-3">
+                        <div class="fw-bold"><i class="fa-solid fa-cubes me-2"></i> Manage Master Materials</div>
+                        <small class="text-muted d-block mt-1">Add aggregate types, river sand, M-sand, stone dust</small>
+                    </a>
+                    <a href="{{ url_for('admin_complaints') }}" class="btn btn-outline-danger text-start p-3 rounded-3">
+                        <div class="fw-bold"><i class="fa-solid fa-headset me-2"></i> Client Complaints Center</div>
+                        <small class="text-muted d-block mt-1">View and reply to customer issues</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

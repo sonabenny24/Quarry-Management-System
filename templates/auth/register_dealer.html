@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Dealer Registration - Quarry Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white p-4 text-center border-0">
+                <i class="fa-solid fa-building-user display-6 mb-2"></i>
+                <h4 class="fw-bold mb-0">Quarry Dealer Registration</h4>
+                <p class="small mb-0">Register your quarry business (subject to Admin approval)</p>
+            </div>
+            <div class="card-body p-4 p-md-5 bg-white">
+                <form method="POST" action="{{ url_for('register_dealer') }}">
+                    <h6 class="text-primary fw-bold text-uppercase border-bottom pb-2 mb-3">Company Details</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Company / Quarry Name</label>
+                            <input type="text" class="form-control" name="company_name" placeholder="Apex Rock & Granite Ltd" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Quarry License Number</label>
+                            <input type="text" class="form-control" name="license_no" placeholder="QRL-2024-XXXX" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Quarry Site Location</label>
+                            <input type="text" class="form-control" name="quarry_location" placeholder="Palai, Kottayam, Kerala" required>
+                        </div>
+                    </div>
+
+                    <h6 class="text-primary fw-bold text-uppercase border-bottom pb-2 mb-3">Account Credentials</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Authorized Person Name</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Username</label>
+                            <input type="text" class="form-control" name="username" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Business Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Contact Phone</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Office Address</label>
+                            <input type="text" class="form-control" name="address" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm rounded-3 mt-4">
+                        <i class="fa-solid fa-paper-plane me-2"></i> Submit Dealer Application
+                    </button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('login') }}" class="text-decoration-none">Return to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

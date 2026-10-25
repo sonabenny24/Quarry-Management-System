@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Dealer Approvals & Management - Admin{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Quarry Dealer Directory & Approvals</h3>
+    <p class="text-muted small">Review pending registration requests and manage authorized quarry dealers</p>
+</div>
+
+<!-- Pending Dealers Table -->
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-header bg-warning text-dark py-3 fw-bold">
+        <i class="fa-solid fa-clock me-2"></i> Pending Dealer Registration Requests ({{ pending_dealers|length }})
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Dealer / Company</th>
+                    <th>License No.</th>
+                    <th>Quarry Location</th>
+                    <th>Contact Person</th>
+                    <th>Email & Phone</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dealer in pending_dealers %}
+                <tr>
+                    <td>
+                        <div class="fw-bold">{{ dealer.dealer_profile.company_name if dealer.dealer_profile else dealer.name }}</div>
+                        <small class="text-muted">Username: {{ dealer.username }}</small>
+                    </td>
+                    <td><span class="badge bg-secondary">{{ dealer.dealer_profile.license_no if dealer.dealer_profile else 'N/A' }}</span></td>
+                    <td>{{ dealer.dealer_profile.quarry_location if dealer.dealer_profile else dealer.address }}</td>
+                    <td>{{ dealer.name }}</td>
+                    <td>
+                        <div>{{ dealer.email }}</div>
+                        <small class="text-muted">{{ dealer.phone }}</small>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form method="POST" action="{{ url_for('approve_dealer', dealer_id=dealer.user_id) }}">
+                                <button type="submit" class="btn btn-success btn-sm rounded-pill">
+                                    <i class="fa-solid fa-check me-1"></i> Approve
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('reject_dealer', dealer_id=dealer.user_id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm rounded-pill">
+                                    <i class="fa-solid fa-xmark me-1"></i> Reject
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">No pending dealer registration requests.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Approved Dealers Table -->
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header bg-success text-white py-3 fw-bold">
+        <i class="fa-solid fa-building-circle-check me-2"></i> Approved & Active Dealers ({{ approved_dealers|length }})
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Dealer ID</th>
+                    <th>Company Name</th>
+                    <th>License No.</th>
+                    <th>Quarry Location</th>
+                    <th>Authorized Contact</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dealer in approved_dealers %}
+                <tr>
+                    <td class="fw-bold">#D-{{ dealer.user_id }}</td>
+                    <td class="fw-bold text-primary">{{ dealer.dealer_profile.company_name if dealer.dealer_profile else dealer.name }}</td>
+                    <td><span class="badge bg-outline-dark border text-dark">{{ dealer.dealer_profile.license_no if dealer.dealer_profile else 'N/A' }}</span></td>
+                    <td>{{ dealer.dealer_profile.quarry_location if dealer.dealer_profile else dealer.address }}</td>
+                    <td>{{ dealer.name }}</td>
+                    <td>{{ dealer.phone }}</td>
+                    <td><span class="badge bg-success">Approved</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">No approved dealers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

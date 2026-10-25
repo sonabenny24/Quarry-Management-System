@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Driver Pass - Dealer{% endblock %}
+
+{% block content %}
+<div class="pass-container py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold mb-0"><i class="fa-solid fa-ticket-simple text-primary me-2"></i> Issue Driver Delivery Pass</h3>
+        <a href="{{ url_for('dealer_driver_pass_list') }}" class="btn btn-outline-secondary rounded-pill px-3">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Driver Pass List
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-dark text-white p-4">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-file-signature me-2 text-warning"></i> Driver Pass Creation Form</h5>
+            <small class="text-muted">Select an approved customer order and driver to issue an official delivery pass</small>
+        </div>
+
+        <div class="card-body p-4 p-md-5 bg-white">
+            <form id="createPassForm" method="POST" action="{{ url_for('create_driver_pass') }}">
+                
+                <div class="row g-3 mb-4">
+                    <!-- Auto-generated Pass ID (Read-only) -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Pass ID</label>
+                        <input type="text" class="form-control bg-light text-muted fw-bold" value="[Auto-Generated on Creation]" readonly>
+                    </div>
+
+                    <!-- Pass Status (Default Issued) -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Pass Status</label>
+                        <input type="text" class="form-control bg-light text-primary fw-bold" value="Issued" readonly>
+                    </div>
+                </div>
+
+                <h6 class="text-primary fw-bold text-uppercase border-bottom pb-2 mb-3">Order & Driver Selection</h6>
+                
+                <div class="row g-3 mb-4">
+                    <!-- Order ID Dropdown -->
+                    <div class="col-md-6">
+                        <label for="order_id" class="form-label fw-bold">Order ID <span class="text-danger">*</span></label>
+                        <select class="form-select border-primary" id="order_id" name="order_id" required>
+                            <option value="">-- Select Approved Order --</option>
+                            {% for ord_item in orders %}
+                            <option value="{{ ord_item.order_id }}">
+                                Order #{{ ord_item.order_id }} - {{ ord_item.client.name }} ({{ ord_item.material.name }}, {{ ord_item.quantity }} {{ ord_item.material.unit }})
+                            </option>
+                            {% else %}
+                            <option value="" disabled>No eligible approved orders available</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Only approved client orders without active passes appear here.</small>
+                    </div>
+
+                    <!-- Driver Dropdown -->
+                    <div class="col-md-6">
+                        <label for="driver_id" class="form-label fw-bold">Driver <span class="text-danger">*</span></label>
+                        <select class="form-select border-primary" id="driver_id" name="driver_id" required>
+                            <option value="">-- Select Driver --</option>
+                            {% for drv in drivers %}
+                            <option value="{{ drv.driver_id }}">
+                                {{ drv.user.name }} (Vehicle: {{ drv.vehicle_number }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <h6 class="text-primary fw-bold text-uppercase border-bottom pb-2 mb-3">Auto-Populated Details (From Order & Driver)</h6>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Client Name</label>
+                        <input type="text" class="form-control bg-light text-dark fw-medium" id="client_name" readonly placeholder="Auto-populated from selected order">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Vehicle Number</label>
+                        <input type="text" class="form-control bg-light text-dark fw-bold" id="vehicle_number" readonly placeholder="Auto-populated from selected driver">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Material</label>
+                        <input type="text" class="form-control bg-light text-dark fw-medium" id="material" readonly placeholder="Auto-populated from selected order">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Quantity</label>
+                        <input type="text" class="form-control bg-light text-dark fw-medium" id="quantity" readonly placeholder="Auto-populated from selected order">
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Delivery Address</label>
+                        <textarea class="form-control bg-light text-dark fw-medium" id="delivery_address" rows="2" readonly placeholder="Auto-populated from selected order"></textarea>
+                    </div>
+                </div>
+
+                <h6 class="text-primary fw-bold text-uppercase border-bottom pb-2 mb-3">Pass Validity & Remarks</h6>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="issue_date" class="form-label fw-bold">Issue Date</label>
+                        <input type="date" class="form-control bg-light text-dark" id="issue_date" name="issue_date" value="{{ issue_date }}" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="valid_until" class="form-label fw-bold">Valid Until <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control border-primary" id="valid_until" name="valid_until" value="{{ valid_until }}" required>
+                        <small class="text-muted">Must be on or after the issue date.</small>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="remarks" class="form-label fw-bold">Remarks (Optional)</label>
+                        <textarea class="form-control" id="remarks" name="remarks" rows="2" placeholder="e.g. Special gate pass instructions, priority batch delivery..."></textarea>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-3 mt-4">
+                    <a href="{{ url_for('dealer_driver_pass_list') }}" class="btn btn-light btn-lg px-4 rounded-pill">Cancel</a>
+                    <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm fw-bold">
+                        <i class="fa-solid fa-check me-2"></i> Generate Pass
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

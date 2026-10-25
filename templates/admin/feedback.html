@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}System Feedback & Reviews - Admin{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">System Feedback & Dealer Reviews</h3>
+    <p class="text-muted small">Monitor customer feedback and dealer star ratings across the platform</p>
+</div>
+
+<ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active rounded-pill px-4" id="pills-feedback-tab" data-bs-toggle="pill" data-bs-target="#pills-feedback" type="button" role="tab">
+            <i class="fa-solid fa-comment-dots me-2"></i> System Feedback ({{ feedbacks|length }})
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill px-4" id="pills-reviews-tab" data-bs-toggle="pill" data-bs-target="#pills-reviews" type="button" role="tab">
+            <i class="fa-solid fa-star me-2"></i> Dealer Reviews ({{ reviews|length }})
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="pills-tabContent">
+    <!-- Feedback Tab -->
+    <div class="tab-pane fade show active" id="pills-feedback" role="tabpanel">
+        <div class="row g-3">
+            {% for fb in feedbacks %}
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0">{{ fb.client.name }}</h6>
+                            <div class="text-warning">
+                                {% for i in range(fb.rating) %}<i class="fa-solid fa-star"></i>{% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-muted mb-2">{{ fb.message }}</p>
+                        <small class="text-muted border-top pt-2 d-block fs-7"><i class="fa-solid fa-calendar me-1"></i> Submitted on {{ fb.created_at.strftime('%b %d, %Y') }}</small>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center text-muted py-4">No system feedback submitted yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Reviews Tab -->
+    <div class="tab-pane fade" id="pills-reviews" role="tabpanel">
+        <div class="row g-3">
+            {% for rev in reviews %}
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <h6 class="fw-bold mb-0">{{ rev.client.name }}</h6>
+                                <small class="text-primary fw-bold">Review for: {{ rev.dealer.dealer_profile.company_name if rev.dealer.dealer_profile else rev.dealer.name }}</small>
+                            </div>
+                            <div class="text-warning">
+                                {% for i in range(rev.rating) %}<i class="fa-solid fa-star"></i>{% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-muted mb-2">{{ rev.comment or 'No written comment.' }}</p>
+                        <small class="text-muted border-top pt-2 d-block fs-7"><i class="fa-solid fa-calendar me-1"></i> {{ rev.created_at.strftime('%b %d, %Y') }}</small>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center text-muted py-4">No dealer reviews posted yet.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

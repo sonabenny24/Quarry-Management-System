@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice #ORD-{{ order.order_id }}{% endblock %}
+
+{% block content %}
+<div class="pass-container py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+        <a href="{{ url_for('client_dashboard') if current_user.role == 'client' else url_for('dealer_orders') }}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back
+        </a>
+        <button onclick="window.print()" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fa-solid fa-print me-2"></i> Print Invoice
+        </button>
+    </div>
+
+    <div class="card pass-card border-0 shadow-md">
+        <div class="card-body p-4 p-md-5">
+            <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4">
+                <div>
+                    <h3 class="fw-bold text-dark mb-1">QUARRY MANAGEMENT SYSTEM</h3>
+                    <p class="text-muted mb-0">Official Tax Invoice / Bill Receipt</p>
+                </div>
+                <div class="text-end">
+                    <h4 class="fw-bold text-primary mb-0">INVOICE #INV-{{ order.order_id }}</h4>
+                    <small class="text-muted">Date: {{ order.created_at.strftime('%Y-%m-%d') }}</small>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <h6 class="text-uppercase text-muted fw-bold small">Supplier Details</h6>
+                    <h5 class="fw-bold text-dark mb-1">{{ order.dealer.dealer_profile.company_name if order.dealer.dealer_profile else order.dealer.name }}</h5>
+                    <div>License No: {{ order.dealer.dealer_profile.license_no if order.dealer.dealer_profile else 'N/A' }}</div>
+                    <div>Location: {{ order.dealer.dealer_profile.quarry_location if order.dealer.dealer_profile else order.dealer.address }}</div>
+                    <div>Phone: {{ order.dealer.phone or 'N/A' }}</div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h6 class="text-uppercase text-muted fw-bold small">Customer Details</h6>
+                    <h5 class="fw-bold text-dark mb-1">{{ order.client.name }}</h5>
+                    <div>Phone: {{ order.client.phone or 'N/A' }}</div>
+                    <div>Email: {{ order.client.email }}</div>
+                    <div>Address: {{ order.delivery_address }}</div>
+                </div>
+            </div>
+
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item & Material Description</th>
+                            <th>Quantity</th>
+                            <th>Unit Rate (₹)</th>
+                            <th class="text-end">Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="fw-bold">{{ order.material.name }}</div>
+                                <small class="text-muted">{{ order.material.description or '' }}</small>
+                            </td>
+                            <td>{{ order.quantity }} {{ order.material.unit }}</td>
+                            <td>₹{{ "%.2f"|format(order.unit_price) }}</td>
+                            <td class="text-end fw-bold">₹{{ "%.2f"|format(order.total_price) }}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold">Subtotal:</td>
+                            <td class="text-end fw-bold">₹{{ "%.2f"|format(order.total_price) }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold text-success">Grand Total:</td>
+                            <td class="text-end fw-bold fs-5 text-success">₹{{ "%.2f"|format(order.total_price) }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="p-3 bg-light rounded border">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <small class="text-muted d-block">Payment Status</small>
+                        <span class="badge bg-success fs-6">
+                            {% if order.payments %}{{ order.payments[0].payment_status }} ({{ order.payments[0].payment_method }}){% else %}PAID{% endif %}
+                        </span>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <small class="text-muted d-block">Transaction Ref</small>
+                        <code>{% if order.payments %}{{ order.payments[0].transaction_ref }}{% else %}SYS-OFFICIAL-PAID{% endif %}</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5 pt-4 border-top">
+                <p class="small text-muted mb-0">Thank you for your business! Quarry Management System</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

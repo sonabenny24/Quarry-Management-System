@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quarry Management System{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/print.css') }}" media="print">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-2 no-print">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('dashboard') if current_user else url_for('login') }}">
+                <i class="fa-solid fa-mountain-city text-primary"></i>
+                <span class="fw-bold">Quarry Management System</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if current_user %}
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="fa-solid fa-gauge me-1"></i> Dashboard
+                        </a>
+                    </li>
+
+                    {% if current_user.role == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_dealers') }}">
+                            <a class="nav-link" href="{{ url_for('admin_dealers') }}"><i class="fa-solid fa-user-check me-1"></i> Dealers</a>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_clients') }}"><i class="fa-solid fa-users me-1"></i> Clients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_materials') }}"><i class="fa-solid fa-cubes me-1"></i> Materials</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_complaints') }}"><i class="fa-solid fa-circle-exclamation me-1"></i> Complaints</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_feedback') }}"><i class="fa-solid fa-comments me-1"></i> Feedback</a>
+                    </li>
+
+                    {% elif current_user.role == 'dealer' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dealer_stock') }}"><i class="fa-solid fa-boxes-stacked me-1"></i> Inventory Stock</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dealer_drivers') }}"><i class="fa-solid fa-id-card me-1"></i> Drivers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dealer_orders') }}"><i class="fa-solid fa-cart-flatbed me-1"></i> Client Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dealer_driver_pass_list') }}">
+                            <i class="fa-solid fa-ticket-simple me-1"></i> Driver Pass
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dealer_payments') }}"><i class="fa-solid fa-receipt me-1"></i> Payments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dealer_reviews') }}"><i class="fa-solid fa-star me-1"></i> Reviews</a>
+                    </li>
+
+                    {% elif current_user.role == 'client' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('client_browse') }}"><i class="fa-solid fa-magnifying-glass me-1"></i> Browse Materials</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('client_complaints') }}"><i class="fa-solid fa-headset me-1"></i> Complaints</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('client_feedback') }}"><i class="fa-solid fa-comment-dots me-1"></i> Feedback & Reviews</a>
+                    </li>
+
+                    {% elif current_user.role == 'driver' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('driver_dashboard') }}"><i class="fa-solid fa-truck-ramp-box me-1"></i> My Deliveries</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('driver_passes') }}"><i class="fa-solid fa-id-card-clip me-1"></i> Driver Passes</a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="text-end">
+                        <span class="d-block text-white fw-bold small">{{ current_user.name }}</span>
+                        <span class="badge badge-role badge-role-{{ current_user.role }}">{{ current_user.role }}</span>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                        <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                    </a>
+                </div>
+                {% else %}
+                <div class="ms-auto d-flex gap-2">
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">Login</a>
+                    <a href="{{ url_for('register_client') }}" class="btn btn-primary btn-sm rounded-pill px-3">Register as Client</a>
+                    <a href="{{ url_for('register_dealer') }}" class="btn btn-warning btn-sm rounded-pill px-3">Register as Dealer</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Notifications -->
+    <div class="container mt-3 no-print">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm border-0" role="alert">
+                        <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-circle-xmark{% elif category == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Body -->
+    <main class="container-fluid px-4 py-3">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center no-print">
+        <div class="container">
+            <p class="mb-1 fw-medium">Quarry Management System &copy; 2026 - Centralized Web Platform</p>
+            <small class="text-muted">Department of Computer Applications | MCA Mini Project</small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

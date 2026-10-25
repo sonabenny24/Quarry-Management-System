@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Dealer Reviews & Ratings{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Customer Reviews & Ratings</h3>
+    <p class="text-muted small">Feedback and star ratings posted by clients regarding material quality and delivery</p>
+</div>
+
+<div class="row g-3">
+    {% for rev in reviews %}
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0 text-dark">{{ rev.client.name }}</h6>
+                    <div class="text-warning fs-5">
+                        {% for i in range(rev.rating) %}<i class="fa-solid fa-star"></i>{% endfor %}
+                    </div>
+                </div>
+                <p class="text-muted mb-2">{{ rev.comment or 'No written comment.' }}</p>
+                <small class="text-muted border-top pt-2 d-block fs-7"><i class="fa-solid fa-calendar me-1"></i> Posted on {{ rev.created_at.strftime('%b %d, %Y') }}</small>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center text-muted py-5">
+        <i class="fa-solid fa-star display-5 text-muted mb-3 d-block"></i>
+        No customer reviews received yet.
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

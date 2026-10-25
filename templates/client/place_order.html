@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Place Order - Quarry Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white p-4">
+                <h4 class="fw-bold mb-0"><i class="fa-solid fa-cart-plus me-2"></i> Submit Quarry Material Order</h4>
+                <p class="small mb-0">Fill in quantity and delivery details for supplier approval</p>
+            </div>
+            <div class="card-body p-4 p-md-5 bg-white">
+                <form method="POST" action="{{ url_for('place_order') }}">
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Select Material & Supplier <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-lg border-primary" name="stock_id" id="stockSelect" required onchange="calculateTotal()">
+                            {% for st in all_stocks %}
+                            <option value="{{ st.stock_id }}" data-price="{{ st.price_per_unit }}" data-unit="{{ st.material.unit }}" data-max="{{ st.quantity }}" {% if selected_stock and selected_stock.stock_id == st.stock_id %}selected{% endif %}>
+                                {{ st.material.name }} - {{ st.dealer.dealer_profile.company_name if st.dealer.dealer_profile else st.dealer.name }} (₹{{ "%.2f"|format(st.price_per_unit) }}/{{ st.material.unit }}, Avail: {{ st.quantity }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Required Quantity <span class="text-danger">*</span></label>
+                            <input type="number" step="0.1" class="form-control form-control-lg" name="quantity" id="quantityInput" placeholder="e.g. 15" required oninput="calculateTotal()">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Requested Delivery Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control form-control-lg" name="requested_date" value="{{ default_date }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Full Delivery Address <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="delivery_address" rows="3" required>{{ current_user.address or '' }}</textarea>
+                    </div>
+
+                    <!-- Price Estimate Box -->
+                    <div class="p-3 bg-light rounded-3 border mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-secondary">Estimated Total Amount:</span>
+                            <h3 class="fw-bold text-success mb-0" id="totalDisplay">₹0.00</h3>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <a href="{{ url_for('client_browse') }}" class="btn btn-light btn-lg w-50 rounded-pill">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-lg w-50 rounded-pill shadow-sm fw-bold">
+                            Submit Order Request
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function calculateTotal() {
+    const select = document.getElementById('stockSelect');
+    const qty = parseFloat(document.getElementById('quantityInput').value) || 0;
+    const option = select.options[select.selectedIndex];
+    if (option) {
+        const price = parseFloat(option.getAttribute('data-price')) || 0;
+        const total = qty * price;
+        document.getElementById('totalDisplay').innerText = `₹${total.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
+}
+document.addEventListener('DOMContentLoaded', calculateTotal);
+</script>
+{% endblock %}

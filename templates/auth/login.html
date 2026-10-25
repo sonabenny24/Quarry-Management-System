@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Quarry Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-dark text-white p-4 text-center border-0">
+                <i class="fa-solid fa-mountain-city display-5 text-primary mb-2"></i>
+                <h4 class="fw-bold mb-0">Quarry Management System</h4>
+                <p class="text-muted small mb-0">Sign in to access your portal</p>
+            </div>
+            <div class="card-body p-4 p-md-5 bg-white">
+                <form method="POST" action="{{ url_for('login') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-bold">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="password" class="form-label fw-bold mb-0">Password</label>
+                            <a href="{{ url_for('forgot_password') }}" class="small text-decoration-none fw-semibold">Forgot password?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-lock text-muted"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm rounded-3">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i> Sign In
+                    </button>
+                </form>
+
+                <hr class="my-4">
+
+                <div class="mt-4 text-center">
+                    <p class="small text-muted mb-1">New user?</p>
+                    <a href="{{ url_for('register_client') }}" class="fw-bold text-decoration-none me-2">Register as Client</a> | 
+                    <a href="{{ url_for('register_dealer') }}" class="fw-bold text-decoration-none ms-2">Register as Dealer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

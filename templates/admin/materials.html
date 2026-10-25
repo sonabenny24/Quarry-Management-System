@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Approved Dealers Materials - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Approved Dealers Materials</h3>
+        <p class="text-muted small">Manage materials assigned to each approved dealer</p>
+    </div>
+    <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addMaterialModal">
+        <i class="fa-solid fa-plus me-1"></i> Add New Material
+    </button>
+</div>
+
+<!-- Filter Section -->
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-body bg-light rounded-3">
+        <form method="GET" action="{{ url_for('admin_materials') }}" class="d-flex align-items-center">
+            <label for="dealer_id_filter" class="form-label fw-bold me-3 mb-0 text-nowrap"><i class="fa-solid fa-filter text-primary me-1"></i> Filter by Dealer:</label>
+            <select name="dealer_id" id="dealer_id_filter" class="form-select me-3" onchange="this.form.submit()">
+                <option value="">All Approved Dealers</option>
+                {% for dealer in approved_dealers %}
+                    <option value="{{ dealer.user_id }}" {% if selected_dealer_id == dealer.user_id %}selected{% endif %}>
+                        {{ dealer.dealer_profile.company_name if dealer.dealer_profile else dealer.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            {% if selected_dealer_id %}
+                <a href="{{ url_for('admin_materials') }}" class="btn btn-outline-secondary text-nowrap">Clear Filter</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- Dealers Materials Sections -->
+{% for section in dealer_sections %}
+<div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0 text-primary">
+            <i class="fa-solid fa-building me-2"></i>Dealer: {{ section.dealer.dealer_profile.company_name if section.dealer.dealer_profile else section.dealer.name }}
+        </h5>
+        <span class="badge bg-info text-dark rounded-pill px-3 py-2">Total Materials: {{ section.total_count }}</span>
+    </div>
+    <div class="card-body p-0">
+        {% if section.materials %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Material ID</th>
+                        <th>Material Name</th>
+                        <th>Unit</th>
+                        <th>Description</th>
+                        <th>Stock Quantity</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mat in section.materials %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-muted">#M-{{ mat.material_id }}</td>
+                        <td class="fw-bold fs-6">{{ mat.name }}</td>
+                        <td><span class="badge bg-secondary">{{ mat.unit }}</span></td>
+                        <td><small class="text-muted">{{ mat.description or 'No description provided.' }}</small></td>
+                        <td class="fw-bold text-success">{{ mat.stock_quantity }} {{ mat.unit }}s</td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-4 text-center">
+            <h6 class="text-muted mb-0"><i class="fa-solid fa-folder-open me-2"></i>No Materials Assigned</h6>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning text-center shadow-sm" role="alert">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i> No approved dealers found in the system.
+</div>
+{% endfor %}
+
+<!-- Add Material Modal -->
+<div class="modal fade" id="addMaterialModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin_materials') }}">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-cubes me-2 text-primary"></i> Assign New Material</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Select Dealer</label>
+                        <select class="form-select" name="dealer_id" required>
+                            <option value="">-- Choose an Approved Dealer --</option>
+                            {% for dealer in approved_dealers %}
+                                <option value="{{ dealer.user_id }}">
+                                    {{ dealer.dealer_profile.company_name if dealer.dealer_profile else dealer.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Material Name</label>
+                        <input type="text" class="form-control" name="name" placeholder="e.g. 20mm Aggregate" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Measurement Unit</label>
+                            <select class="form-select" name="unit" required>
+                                <option value="Ton">Ton</option>
+                                <option value="Cubic Feet">Cubic Feet</option>
+                                <option value="Load">Load</option>
+                                <option value="Bag">Bag</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Initial Stock Qty</label>
+                            <input type="number" step="0.01" min="0" class="form-control" name="stock_quantity" value="0.0" placeholder="0.0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Description</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Brief material specifications..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Assign Material</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

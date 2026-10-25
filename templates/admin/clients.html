@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Registered Clients - Admin{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Registered Clients Directory</h3>
+    <p class="text-muted small">List of all registered customer accounts using the platform</p>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Client ID</th>
+                    <th>Client Name</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Delivery Address</th>
+                    <th>Total Orders</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td class="fw-bold">#C-{{ client.user_id }}</td>
+                    <td class="fw-bold text-dark">{{ client.name }}</td>
+                    <td><code>{{ client.username }}</code></td>
+                    <td>{{ client.email }}</td>
+                    <td>{{ client.phone }}</td>
+                    <td>{{ client.address }}</td>
+                    <td><span class="badge bg-primary rounded-pill">{{ client.client_orders|length }}</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">No registered clients found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

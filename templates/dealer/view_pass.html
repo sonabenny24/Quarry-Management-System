@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Driver Delivery Pass #PASS-{{ pass_item.pass_id }}{% endblock %}
+
+{% block content %}
+<div class="pass-container py-3">
+    <!-- Top Action Buttons (Hidden when printing) -->
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+        <a href="{{ url_for('dealer_driver_pass_list') if current_user.role == 'dealer' else url_for('driver_passes') }}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Driver Pass List
+        </a>
+        <button onclick="window.print()" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fa-solid fa-print me-2"></i> Print Pass
+        </button>
+    </div>
+
+    <!-- Official Printable Pass Card -->
+    <div class="pass-card">
+        <div class="pass-header text-center">
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+                <i class="fa-solid fa-mountain-city fs-2 text-warning"></i>
+                <h3 class="fw-bold mb-0 text-white text-uppercase tracking-wide">QUARRY MANAGEMENT SYSTEM</h3>
+            </div>
+            <h5 class="fw-semibold text-warning-emphasis mb-0 tracking-wider">DRIVER DELIVERY PASS</h5>
+        </div>
+
+        <div class="pass-body">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <div>
+                    <span class="text-muted small text-uppercase d-block fw-bold">Pass Reference</span>
+                    <h4 class="fw-bold text-primary mb-0">#PASS-{{ pass_item.pass_id }}</h4>
+                </div>
+                <div class="text-end">
+                    <span class="text-muted small text-uppercase d-block fw-bold">Pass Status</span>
+                    <span class="status-badge status-{{ pass_item.pass_status.lower() }} fs-6 px-3 py-1">
+                        {{ pass_item.pass_status }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="pass-row">
+                        <div class="pass-label">Pass ID:</div>
+                        <div class="pass-value">#PASS-{{ pass_item.pass_id }}</div>
+                    </div>
+                    <div class="pass-row">
+                        <div class="pass-label">Order ID:</div>
+                        <div class="pass-value">#ORD-{{ pass_item.order_id }}</div>
+                    </div>
+                    <div class="pass-row">
+                        <div class="pass-label">Driver Name:</div>
+                        <div class="pass-value">{{ pass_item.driver.user.name }}</div>
+                    </div>
+                    <div class="pass-row">
+                        <div class="pass-label">License Number:</div>
+                        <div class="pass-value"><code>{{ pass_item.driver.license_number }}</code></div>
+                    </div>
+                    <div class="pass-row">
+                        <div class="pass-label">Vehicle Number:</div>
+                        <div class="pass-value"><span class="badge bg-dark fs-6">{{ pass_item.driver.vehicle_number }}</span></div>
+                    </div>
+                    <div class="pass-row">
+                        <div class="pass-label">Dealer Name:</div>
+                        <div class="pass-value fw-bold text-primary">
+                            {{ pass_item.dealer.dealer_profile.company_name if pass_item.dealer.dealer_profile else pass_item.dealer.name }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="pass-row">
+                        <div class="pass-label">Client Name:</div>
+                        <div class="pass-value fw-bold">{{ pass_item.order.client.name }}</div>
+                    </div>
+                    <div class="pass-row">
+                        <div class="pass-label">Material:</div>
+                        <div class="pass-value text-primary fw-bold">{{ pass_item.order.material.name }}</div>
+                    </div>
+                    <div class="pass-row">
+                        <div class="pass-label">Quantity:</div>
+                        <div class="pass-value fw-bold">{{ pass_item.order.quantity }} {{ pass_item.order.material.unit }}</div>
+                    </div>
+                    <div class="pass-row">
+                        <div class="pass-label">Issue Date:</div>
+                        <div class="pass-value">{{ pass_item.issue_date.strftime('%Y-%m-%d') }}</div>
+                    </div>
+                    <div class="pass-row">
+                        <div class="pass-label">Valid Until:</div>
+                        <div class="pass-value {% if pass_item.pass_status == 'Expired' %}text-danger fw-bold{% endif %}">
+                            {{ pass_item.valid_until.strftime('%Y-%m-%d') }}
+                        </div>
+                    </div>
+                    <div class="pass-row">
+                        <div class="pass-label">Pass Status:</div>
+                        <div class="pass-value fw-bold">{{ pass_item.pass_status }}</div>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-3">
+                    <div class="p-3 bg-light rounded border">
+                        <span class="pass-label d-block mb-1">Delivery Address:</span>
+                        <div class="pass-value w-100 fw-bold">{{ pass_item.order.delivery_address }}</div>
+                    </div>
+                </div>
+
+                {% if pass_item.remarks %}
+                <div class="col-12 mt-2">
+                    <div class="p-3 bg-light rounded border">
+                        <span class="pass-label d-block mb-1">Remarks:</span>
+                        <div class="pass-value w-100 fst-italic">{{ pass_item.remarks }}</div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Signature & Verification Block for Print -->
+            <div class="row mt-5 pt-4 border-top text-center">
+                <div class="col-4">
+                    <div class="border-top border-dark pt-2 small text-muted">Driver Signature</div>
+                </div>
+                <div class="col-4">
+                    <div class="border-top border-dark pt-2 small text-muted">Quarry Gate Stamp</div>
+                </div>
+                <div class="col-4">
+                    <div class="border-top border-dark pt-2 small text-muted">Authorized Dealer Sign</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Action Buttons (Hidden when printing) -->
+    <div class="d-flex justify-content-center gap-3 mt-4 no-print">
+        <button onclick="window.print()" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm fw-bold">
+            <i class="fa-solid fa-print me-2"></i> Print Pass
+        </button>
+        <a href="{{ url_for('dealer_driver_pass_list') if current_user.role == 'dealer' else url_for('driver_passes') }}" class="btn btn-outline-secondary btn-lg rounded-pill px-4">
+            Back to Driver Pass List
+        </a>
+    </div>
+</div>
+{% endblock %}

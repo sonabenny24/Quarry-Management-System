@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Driver Management - Dealer{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Driver Roster & Vehicles</h3>
+        <p class="text-muted small">Manage delivery drivers, driving licenses, and assigned trucks</p>
+    </div>
+    <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addDriverModal">
+        <i class="fa-solid fa-user-plus me-1"></i> Register New Driver
+    </button>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Driver ID</th>
+                    <th>Driver Name</th>
+                    <th>Vehicle Reg. Number</th>
+                    <th>License Number</th>
+                    <th>Contact Phone</th>
+                    <th>Username</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for driver in drivers %}
+                <tr>
+                    <td class="fw-bold">#DRV-{{ driver.driver_id }}</td>
+                    <td class="fw-bold text-dark fs-6">{{ driver.user.name }}</td>
+                    <td><span class="badge bg-dark px-3 py-2 fs-6"><i class="fa-solid fa-truck me-1"></i> {{ driver.vehicle_number }}</span></td>
+                    <td><code>{{ driver.license_number }}</code></td>
+                    <td>{{ driver.user.phone or 'N/A' }}</td>
+                    <td><code>{{ driver.user.username }}</code></td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_driver', driver_id=driver.driver_id) }}" onsubmit="return confirm('Delete driver profile?');">
+                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle" title="Delete Driver">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">No drivers registered yet under your dealership.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Driver Modal -->
+<div class="modal fade" id="addDriverModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('dealer_drivers') }}">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-id-card me-2 text-primary"></i> Register New Driver</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Driver Full Name</label>
+                        <input type="text" class="form-control" name="name" placeholder="e.g. Vijayan Pillai" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Vehicle Reg. Number</label>
+                            <input type="text" class="form-control" name="vehicle_number" placeholder="KL-05-AB-1234" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">License Number</label>
+                            <input type="text" class="form-control" name="license_number" placeholder="KL-05-2020-XXXX" required>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Username</label>
+                            <input type="text" class="form-control" name="username" placeholder="vijayan_driver" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email</label>
+                            <input type="email" class="form-control" name="email" placeholder="driver@quarry.com" required>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Phone Number</label>
+                            <input type="tel" class="form-control" name="phone" placeholder="9876543210" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Register Driver</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

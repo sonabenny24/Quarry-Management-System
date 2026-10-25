@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Client Registration - Quarry Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-success text-white p-4 text-center border-0">
+                <i class="fa-solid fa-user-plus display-6 mb-2"></i>
+                <h4 class="fw-bold mb-0">Client Registration</h4>
+                <p class="small mb-0">Create your customer account to order quarry materials</p>
+            </div>
+            <div class="card-body p-4 p-md-5 bg-white">
+                <form method="POST" action="{{ url_for('register_client') }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Full Name</label>
+                            <input type="text" class="form-control" name="name" placeholder="e.g. Ramesh Kumar" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Username</label>
+                            <input type="text" class="form-control" name="username" placeholder="e.g. ramesh" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email Address</label>
+                            <input type="email" class="form-control" name="email" placeholder="ramesh@example.com" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Phone Number</label>
+                            <input type="tel" class="form-control" name="phone" placeholder="9876543210" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Delivery Address</label>
+                            <textarea class="form-control" name="address" rows="3" placeholder="Enter your full site delivery address..." required></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm rounded-3 mt-4">
+                        <i class="fa-solid fa-check-circle me-2"></i> Complete Registration
+                    </button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('login') }}" class="text-decoration-none">Already have an account? Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

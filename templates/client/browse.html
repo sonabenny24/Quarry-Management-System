@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Materials & Quarry Dealers{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Browse Available Quarry Materials</h3>
+    <p class="text-muted small">Select aggregate, sand, stone dust, or quarry stone from verified dealers</p>
+</div>
+
+<!-- Filter Bar -->
+<div class="card border-0 shadow-sm rounded-3 mb-4 bg-white">
+    <div class="card-body p-3">
+        <form method="GET" action="{{ url_for('client_browse') }}" class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <select class="form-select" name="dealer_id">
+                    <option value="">-- All Approved Quarry Dealers --</option>
+                    {% for dealer in dealers %}
+                    <option value="{{ dealer.user_id }}" {% if selected_dealer_id == dealer.user_id %}selected{% endif %}>
+                        {{ dealer.dealer_profile.company_name if dealer.dealer_profile else dealer.name }} ({{ dealer.dealer_profile.quarry_location if dealer.dealer_profile else dealer.address }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <select class="form-select" name="material_id">
+                    <option value="">-- All Material Types --</option>
+                    {% for mat in materials %}
+                    <option value="{{ mat.material_id }}" {% if selected_material_id == mat.material_id %}selected{% endif %}>
+                        {{ mat.name }} (Unit: {{ mat.unit }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-dark w-100 rounded-pill"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+                <a href="{{ url_for('client_browse') }}" class="btn btn-outline-secondary rounded-pill" title="Reset"><i class="fa-solid fa-arrows-rotate"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Stocks Cards Grid -->
+<div class="row g-4">
+    {% for stock in available_stocks %}
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden hover-card">
+            <div class="card-header bg-dark text-white p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-primary text-uppercase">{{ stock.material.unit }}</span>
+                    <span class="badge bg-success">In Stock: {{ stock.quantity }} {{ stock.material.unit }}</span>
+                </div>
+                <h5 class="fw-bold mt-2 mb-0 text-white">{{ stock.material.name }}</h5>
+            </div>
+            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <div>
+                    <p class="text-muted small mb-3">{{ stock.material.description or 'High grade quarry material suitable for construction and concrete.' }}</p>
+                    
+                    <div class="border-top border-bottom py-2 my-2">
+                        <small class="text-muted d-block fw-bold text-uppercase">Quarry Supplier</small>
+                        <div class="fw-bold text-primary fs-6">{{ stock.dealer.dealer_profile.company_name if stock.dealer.dealer_profile else stock.dealer.name }}</div>
+                        <small class="text-muted"><i class="fa-solid fa-location-dot me-1"></i> {{ stock.dealer.dealer_profile.quarry_location if stock.dealer.dealer_profile else stock.dealer.address }}</small>
+                    </div>
+
+                    <div class="mt-3">
+                        <small class="text-muted text-uppercase fw-bold d-block">Unit Price</small>
+                        <h3 class="fw-bold text-success mb-0">₹{{ "%.2f"|format(stock.price_per_unit) }} <small class="fs-6 text-muted">/ {{ stock.material.unit }}</small></h3>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="{{ url_for('place_order', stock_id=stock.stock_id) }}" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm">
+                        <i class="fa-solid fa-cart-shopping me-2"></i> Order Material
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5 text-muted">
+        <i class="fa-solid fa-boxes-packing display-4 mb-3 d-block"></i>
+        <h5>No materials available matching your selected filter.</h5>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

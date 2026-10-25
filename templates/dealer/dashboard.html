@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Dealer Dashboard - Quarry Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">{{ current_user.dealer_profile.company_name if current_user.dealer_profile else current_user.name }}</h3>
+        <p class="text-muted small mb-0">Quarry Stock Management, Driver Allocation & Pass Issuance</p>
+    </div>
+    <div>
+        <a href="{{ url_for('create_driver_pass') }}" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fa-solid fa-ticket-simple me-2"></i> Issue Driver Pass
+        </a>
+    </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon-box bg-primary text-white"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Stock Items</h6>
+            <h2 class="fw-bold mb-0 text-dark">{{ total_stock_items }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon-box bg-info text-white"><i class="fa-solid fa-id-card"></i></div>
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Active Drivers</h6>
+            <h2 class="fw-bold mb-0 text-dark">{{ total_drivers }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon-box bg-warning text-dark"><i class="fa-solid fa-clock"></i></div>
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Pending Orders</h6>
+            <h2 class="fw-bold mb-0 text-dark">{{ pending_orders }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="icon-box bg-success text-white"><i class="fa-solid fa-ticket"></i></div>
+            <h6 class="text-muted text-uppercase small fw-bold mb-1">Active Driver Passes</h6>
+            <h2 class="fw-bold mb-0 text-dark">{{ active_passes }}</h2>
+        </div>
+    </div>
+</div>
+
+<!-- Main Table & Quick Actions -->
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-cart-flatbed me-2 text-primary"></i> Recent Client Orders</h5>
+                <a href="{{ url_for('dealer_orders') }}" class="btn btn-outline-primary btn-sm rounded-pill">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Client</th>
+                            <th>Material</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td class="fw-bold">#{{ order.order_id }}</td>
+                            <td>{{ order.client.name }}</td>
+                            <td>{{ order.material.name }}</td>
+                            <td>{{ order.quantity }} {{ order.material.unit }}</td>
+                            <td><span class="status-badge status-{{ order.status.lower().replace(' ', '-') }}">{{ order.status }}</span></td>
+                            <td>
+                                {% if order.status == 'Approved' %}
+                                <a href="{{ url_for('create_driver_pass') }}" class="btn btn-sm btn-primary rounded-pill">Issue Pass</a>
+                                {% else %}
+                                <a href="{{ url_for('dealer_orders') }}" class="btn btn-sm btn-outline-secondary rounded-pill">Details</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">No recent orders for your quarry.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white py-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-bolt me-2 text-primary"></i> Dealer Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('dealer_driver_pass_list') }}" class="btn btn-outline-primary text-start p-3 rounded-3">
+                        <div class="fw-bold"><i class="fa-solid fa-ticket-simple me-2"></i> Driver Pass Management</div>
+                        <small class="text-muted d-block mt-1">Issue passes, track validity, search & print driver passes</small>
+                    </a>
+                    <a href="{{ url_for('dealer_stock') }}" class="btn btn-outline-secondary text-start p-3 rounded-3">
+                        <div class="fw-bold"><i class="fa-solid fa-boxes-stacked me-2"></i> Update Inventory Stock</div>
+                        <small class="text-muted d-block mt-1">Adjust available material stock and unit prices</small>
+                    </a>
+                    <a href="{{ url_for('dealer_drivers') }}" class="btn btn-outline-info text-start p-3 rounded-3">
+                        <div class="fw-bold"><i class="fa-solid fa-id-card me-2"></i> Manage Drivers & Vehicles</div>
+                        <small class="text-muted d-block mt-1">Register delivery drivers and truck registration numbers</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

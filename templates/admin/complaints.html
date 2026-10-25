@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Client Complaints - Admin{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Client Complaints Resolution Desk</h3>
+    <p class="text-muted small">View, track, and reply to client inquiries and grievances</p>
+</div>
+
+<div class="row g-4">
+    {% for complaint in complaints %}
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-dark"><i class="fa-solid fa-headset me-2 text-danger"></i> Complaint #{{ complaint.complaint_id }}</span>
+                <span class="badge {% if complaint.status == 'Open' %}bg-warning text-dark{% else %}bg-success{% endif %}">
+                    {{ complaint.status }}
+                </span>
+            </div>
+            <div class="card-body">
+                <h6 class="fw-bold text-primary mb-1">{{ complaint.subject }}</h6>
+                <p class="small text-muted mb-2">By: {{ complaint.client.name }} ({{ complaint.client.email }}) &bull; {{ complaint.created_at.strftime('%b %d, %Y') }}</p>
+                
+                <div class="bg-light p-3 rounded mb-3">
+                    <p class="mb-0 text-dark">{{ complaint.message }}</p>
+                </div>
+
+                {% if complaint.admin_reply %}
+                <div class="border-start border-3 border-success ps-3 my-2">
+                    <small class="fw-bold text-success text-uppercase d-block mb-1"><i class="fa-solid fa-reply me-1"></i> Admin Response:</small>
+                    <p class="small text-muted mb-0">{{ complaint.admin_reply }}</p>
+                </div>
+                {% else %}
+                <form method="POST" action="{{ url_for('admin_complaints') }}">
+                    <input type="hidden" name="complaint_id" value="{{ complaint.complaint_id }}">
+                    <div class="mb-2">
+                        <textarea class="form-control form-control-sm" name="admin_reply" rows="2" placeholder="Write reply to client..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Send Reply
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5 text-muted">
+        <i class="fa-solid fa-check-circle display-4 text-success mb-3 d-block"></i>
+        <h5>No complaints recorded.</h5>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
